@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Garage Otomotif - Service Kendaraan Profesional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: #10b981;
+        }
+        
+        .notification.error {
+            background-color: #ef4444;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #receiptContent, #receiptContent * {
+                visibility: visible;
+            }
+            #receiptContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 20px !important;
+            }
+            .modal {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Smart Garage Otomotif</h1>
+                        <p class="text-blue-100 text-sm">Service Kendaraan Profesional</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6 items-center">
+                    <a href="#home" class="hover:text-blue-200 transition-colors">Beranda</a>
+                    <a href="#services" class="hover:text-blue-200 transition-colors">Layanan</a>
+                    <a href="#booking" class="hover:text-blue-200 transition-colors">Booking</a>
+                    <a href="#contact" class="hover:text-blue-200 transition-colors">Kontak</a>
+                    <button onclick="showAdminLogin()" class="bg-white bg-opacity-20 px-4 py-2 rounded-lg text-sm hover:bg-opacity-30 transition-colors">
+                        Admin
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg text-white py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-5xl font-bold mb-6 fade-in">Layanan Service Terpercaya</h2>
+            <p class="text-xl mb-8 text-blue-100 fade-in">Teknisi berpengalaman dengan peralatan modern untuk kendaraan Anda</p>
+            <button onclick="scrollToBooking()" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors fade-in">
+                Booking Sekarang
+            </button>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12 text-gray-800">Layanan Kami</h3>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="service-card bg-white p-6 rounded-xl shadow-lg">
+                    <div class="text-blue-600 mb-4">
+                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-3">Service Rutin</h4>
+                    <p class="text-gray-600 mb-4">Perawatan berkala untuk menjaga performa kendaraan Anda</p>
+                    <p class="text-2xl font-bold text-blue-600">Rp 150.000</p>
+                </div>
+                
+                <div class="service-card bg-white p-6 rounded-xl shadow-lg">
+                    <div class="text-blue-600 mb-4">
+                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-3">Ganti Oli</h4>
+                    <p class="text-gray-600 mb-4">Penggantian oli mesin dengan oli berkualitas tinggi</p>
+                    <p class="text-2xl font-bold text-blue-600">Rp 80.000</p>
+                </div>
+                
+                <div class="service-card bg-white p-6 rounded-xl shadow-lg">
+                    <div class="text-blue-600 mb-4">
+                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-3">Tune Up</h4>
+                    <p class="text-gray-600 mb-4">Penyetelan mesin untuk performa optimal</p>
+                    <p class="text-2xl font-bold text-blue-600">Rp 200.000</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12 text-gray-800">Booking Service</h3>
+            <div class="max-w-2xl mx-auto">
+                <form id="bookingForm" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                            <input type="text" id="customerName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">No. Telepon</label>
+                            <input type="tel" id="customerPhone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kendaraan</label>
+                            <select id="vehicleType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Pilih Jenis Kendaraan</option>
+                                <option value="Motor">Motor</option>
+                                <option value="Mobil">Mobil</option>
+                                <option value="Truk">Truk</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Plat Nomor</label>
+                            <input type="text" id="plateNumber" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Service</label>
+                        <select id="serviceType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Pilih Jenis Service</option>
+                            <option value="Service Rutin" data-price="150000">Service Rutin - Rp 150.000</option>
+                            <option value="Ganti Oli" data-price="80000">Ganti Oli - Rp 80.000</option>
+                            <option value="Tune Up" data-price="200000">Tune Up - Rp 200.000</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Service</label>
+                            <input type="date" id="serviceDate" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Waktu Service</label>
+                            <select id="serviceTime" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Pilih Waktu</option>
+                                <option value="08:00">08:00 WIB</option>
+                                <option value="10:00">10:00 WIB</option>
+                                <option value="13:00">13:00 WIB</option>
+                                <option value="15:00">15:00 WIB</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Keluhan/Catatan</label>
+                        <textarea id="notes" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Jelaskan keluhan atau catatan khusus..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Booking Sekarang
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12 text-gray-800">Kontak Kami</h3>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="text-blue-600 mb-4 flex justify-center">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-2">Telepon</h4>
+                    <p class="text-gray-600">+62 812-3456-7890</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="text-blue-600 mb-4 flex justify-center">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-2">Email</h4>
+                    <p class="text-gray-600">info@smartgarage.com</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="text-blue-600 mb-4 flex justify-center">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-2">Alamat</h4>
+                    <p class="text-gray-600">Jl. Raya No. 123, Jakarta</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="modal">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6 text-center">Login Admin</h3>
+            <form id="adminLoginForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="adminUsername" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="adminPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700">
+                        Login
+                    </button>
+                    <button type="button" onclick="closeModal('adminModal')" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-400">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Modal -->
+    <div id="adminDashboard" class="modal">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Dashboard Admin</h3>
+                <button onclick="closeModal('adminDashboard')" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <h4 class="text-lg font-semibold text-blue-800">Total Booking</h4>
+                    <p class="text-3xl font-bold text-blue-600" id="totalBookings">0</p>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h4 class="text-lg font-semibold text-green-800">Booking Hari Ini</h4>
+                    <p class="text-3xl font-bold text-green-600" id="todayBookings">0</p>
+                </div>
+                <div class="bg-purple-50 p-6 rounded-lg">
+                    <h4 class="text-lg font-semibold text-purple-800">Total Pendapatan</h4>
+                    <p class="text-3xl font-bold text-purple-600" id="totalRevenue">Rp 0</p>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <button onclick="exportToSpreadsheet()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 mr-4">
+                    Export ke Spreadsheet
+                </button>
+                <button onclick="clearAllData()" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
+                    Hapus Semua Data
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="border border-gray-300 px-4 py-2 text-left">No</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Nama</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Telepon</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Kendaraan</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Service</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Tanggal</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Harga</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingTableBody">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="modal">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div id="receiptContent">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Smart Garage Otomotif</h3>
+                    <p class="text-sm text-gray-600">Bukti Booking Service</p>
+                    <hr class="my-4">
+                </div>
+                
+                <div id="receiptDetails" class="space-y-3 text-sm">
+                    <!-- Detail booking akan diisi oleh JavaScript -->
+                </div>
+                
+                <hr class="my-4">
+                <div class="text-center text-xs text-gray-500">
+                    <p>Terima kasih atas kepercayaan Anda</p>
+                    <p>Jl. Raya No. 123, Jakarta | Tel: +62 812-3456-7890</p>
+                </div>
+            </div>
+            
+            <div class="flex space-x-4 mt-6">
+                <button onclick="printReceipt()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                    Print
+                </button>
+                <button onclick="closeModal('receiptModal')" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage simulation (in real app, this would be connected to a database)
+        let bookingData = JSON.parse(localStorage.getItem('bookingData')) || [];
+        let bookingCounter = parseInt(localStorage.getItem('bookingCounter')) || 1;
+
+        // Admin credentials
+        const adminCredentials = {
+            username: 'admin',
+            password: 'admin123'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('serviceDate').min = today;
+            
+            // Load admin dashboard if needed
+            updateAdminDashboard();
+        });
+
+        // Smooth scrolling
+        function scrollToBooking() {
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showAdminLogin() {
+            showModal('adminModal');
+        }
+
+        // Admin login
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === adminCredentials.username && password === adminCredentials.password) {
+                closeModal('adminModal');
+                showModal('adminDashboard');
+                updateAdminDashboard();
+                showNotification('Login berhasil!');
+                
+                // Clear form
+                document.getElementById('adminLoginForm').reset();
+            } else {
+                showNotification('Username atau password salah!', 'error');
+            }
+        });
+
+        // Booking form submission
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: bookingCounter++,
+                customerName: document.getElementById('customerName').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                vehicleType: document.getElementById('vehicleType').value,
+                plateNumber: document.getElementById('plateNumber').value,
+                serviceType: document.getElementById('serviceType').value,
+                serviceDate: document.getElementById('serviceDate').value,
+                serviceTime: document.getElementById('serviceTime').value,
+                notes: document.getElementById('notes').value,
+                price: document.getElementById('serviceType').selectedOptions[0].dataset.price || 0,
+                bookingDate: new Date().toISOString().split('T')[0],
+                status: 'Terjadwal'
+            };
+            
+            // Add to booking data
+            bookingData.push(formData);
+            
+            // Save to localStorage (simulating database)
+            localStorage.setItem('bookingData', JSON.stringify(bookingData));
+            localStorage.setItem('bookingCounter', bookingCounter.toString());
+            
+            // Show receipt
+            showReceipt(formData);
+            
+            // Reset form
+            document.getElementById('bookingForm').reset();
+            
+            showNotification('Booking berhasil! Silakan simpan bukti booking Anda.');
+        });
+
+        // Show receipt
+        function showReceipt(data) {
+            const receiptDetails = document.getElementById('receiptDetails');
+            const formattedPrice = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(data.price);
+            
+            receiptDetails.innerHTML = `
+                <div class="flex justify-between">
+                    <span class="font-medium">No. Booking:</span>
+                    <span>#${String(data.id).padStart(4, '0')}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Nama:</span>
+                    <span>${data.customerName}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Telepon:</span>
+                    <span>${data.customerPhone}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Kendaraan:</span>
+                    <span>${data.vehicleType}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Plat Nomor:</span>
+                    <span>${data.plateNumber}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Service:</span>
+                    <span>${data.serviceType}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Tanggal:</span>
+                    <span>${new Date(data.serviceDate).toLocaleDateString('id-ID')}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Waktu:</span>
+                    <span>${data.serviceTime} WIB</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">Harga:</span>
+                    <span class="font-bold">${formattedPrice}</span>
+                </div>
+                ${data.notes ? `<div><span class="font-medium">Catatan:</span><br><span class="text-xs">${data.notes}</span></div>` : ''}
+            `;
+            
+            showModal('receiptModal');
+        }
+
+        // Print receipt
+        function printReceipt() {
+            window.print();
+        }
+
+        // Update admin dashboard
+        function updateAdminDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayBookings = bookingData.filter(booking => booking.bookingDate === today);
+            const totalRevenue = bookingData.reduce((sum, booking) => sum + parseInt(booking.price), 0);
+            
+            document.getElementById('totalBookings').textContent = bookingData.length;
+            document.getElementById('todayBookings').textContent = todayBookings.length;
+            document.getElementById('totalRevenue').textContent = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(totalRevenue);
+            
+            // Update table
+            const tableBody = document.getElementById('bookingTableBody');
+            tableBody.innerHTML = '';
+            
+            bookingData.forEach((booking, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border border-gray-300 px-4 py-2">${index + 1}</td>
+                    <td class="border border-gray-300 px-4 py-2">${booking.customerName}</td>
+                    <td class="border border-gray-300 px-4 py-2">${booking.customerPhone}</td>
+                    <td class="border border-gray-300 px-4 py-2">${booking.vehicleType} - ${booking.plateNumber}</td>
+                    <td class="border border-gray-300 px-4 py-2">${booking.serviceType}</td>
+                    <td class="border border-gray-300 px-4 py-2">${new Date(booking.serviceDate).toLocaleDateString('id-ID')}</td>
+                    <td class="border border-gray-300 px-4 py-2">${new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR'
+                    }).format(booking.price)}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <button onclick="deleteBooking(${booking.id})" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                            Hapus
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Delete booking
+        function deleteBooking(bookingId) {
+            if (confirm('Apakah Anda yakin ingin menghapus booking ini?')) {
+                bookingData = bookingData.filter(booking => booking.id !== bookingId);
+                localStorage.setItem('bookingData', JSON.stringify(bookingData));
+                updateAdminDashboard();
+                showNotification('Booking berhasil dihapus!');
+            }
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan!')) {
+                bookingData = [];
+                bookingCounter = 1;
+                localStorage.removeItem('bookingData');
+                localStorage.removeItem('bookingCounter');
+                updateAdminDashboard();
+                showNotification('Semua data berhasil dihapus!');
+            }
+        }
+
+        // Export to spreadsheet (CSV format)
+        function exportToSpreadsheet() {
+            if (bookingData.length === 0) {
+                showNotification('Tidak ada data untuk diekspor!', 'error');
+                return;
+            }
+            
+            const headers = ['No', 'Nama', 'Telepon', 'Jenis Kendaraan', 'Plat Nomor', 'Jenis Service', 'Tanggal Service', 'Waktu', 'Harga', 'Catatan', 'Tanggal Booking', 'Status'];
+            
+            let csvContent = headers.join(',') + '\n';
+            
+            bookingData.forEach((booking, index) => {
+                const row = [
+                    index + 1,
+                    `"${booking.customerName}"`,
+                    `"${booking.customerPhone}"`,
+                    `"${booking.vehicleType}"`,
+                    `"${booking.plateNumber}"`,
+                    `"${booking.serviceType}"`,
+                    `"${booking.serviceDate}"`,
+                    `"${booking.serviceTime}"`,
+                    booking.price,
+                    `"${booking.notes || ''}"`,
+                    `"${booking.bookingDate}"`,
+                    `"${booking.status}"`
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `booking_data_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Data berhasil diekspor ke file CSV!');
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'971ed912e26c602d',t:'MTc1NTY2MTAwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
